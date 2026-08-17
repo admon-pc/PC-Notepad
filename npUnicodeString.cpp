@@ -516,18 +516,14 @@ void npUnicodeString::ToUTF16(npStringW& str)
 	}
 }
 
-uint32_t npUnicodeString::ReadFromFile(const char* fn)
+uint32_t npUnicodeString::_readFromFile(FILE* f)
 {
 	uint32_t ret = 1;
-
-	NP_ASSERT_ST(fn);
-	FILE* f = 0;
-	fopen_s(&f, fn, "rb");
 	if (f)
 	{
 		fseek(f, 0, SEEK_END);
 		auto fsz = ftell(f);
-		if(fsz)
+		if (fsz)
 			Reserve(fsz);
 		fseek(f, 0, SEEK_SET);
 
@@ -585,7 +581,7 @@ uint32_t npUnicodeString::ReadFromFile(const char* fn)
 			isBE = true;
 			ret = 3;
 		}
-		
+
 
 		union
 		{
@@ -674,80 +670,48 @@ uint32_t npUnicodeString::ReadFromFile(const char* fn)
 	return ret;
 }
 
+uint32_t npUnicodeString::ReadFromFile(const wchar_t* fn)
+{
+	FILE* f = _wfopen(fn, L"rb");
+	return _readFromFile(f);
+}
+
+uint32_t npUnicodeString::ReadFromFile(const char* fn)
+{
+	FILE* f = fopen(fn, "rb");
+	return _readFromFile(f);
+}
+
 void npUnicodeString::SaveToFileUTF8(const char* fn, bool addBOM)
 {
-	FILE* f = 0;
-	fopen_s(&f, fn, "wb");
-	if (f && m_data && m_size)
-	{
-		if (addBOM)
-		{
-			uint8_t bom[4] = { 0xEF, 0xBB, 0xBF, 0 };
-			fwrite(bom, 1, 3, f);
-		}
-
-		npUnicodeConverter uc;
-		for (size_t i = 0; i < m_size; ++i)
-		{
-			uc.Set(m_data[i]);
-			for(size_t o = 0; o < uc.m_8Num; ++o)
-			{
-				fwrite(&uc.m_8[o], 1, 1, f);
-			}
-		}
-	}
-
-	if (f)
-		fclose(f);
+	_saveToFileUTF8(fopen(fn, "wb"), addBOM);
 }
 
 void npUnicodeString::SaveToFileUTF16(const char* fn, bool addBOM)
 {
-	FILE* f = 0;
-	fopen_s(&f, fn, "wb");
-	if (f && m_data && m_size)
-	{
-		if (addBOM)
-		{
-			uint8_t bom[4] = { 0xFF, 0xFE, 0, 0 };
-			fwrite(bom, 1, 2, f);
-		}
-
-		npUnicodeConverter uc;
-		for (size_t i = 0; i < m_size; ++i)
-		{
-			uc.Set(m_data[i]);
-			if (uc.m_16Num)
-			{
-				fwrite(&uc.m_16[0], sizeof(char16_t), 1, f);
-				if(uc.m_16Num > 1)
-					fwrite(&uc.m_16[1], sizeof(char16_t), 1, f);
-			}
-		}
-	}
-
-	if (f)
-		fclose(f);
+	_saveToFileUTF16(fopen(fn, "wb"), addBOM);
 }
 
 void npUnicodeString::SaveToFileUTF32(const char* fn, bool addBOM)
 {
-	FILE* f = 0;
-	fopen_s(&f, fn, "wb");
-	if (f && m_data && m_size)
-	{
-		if (addBOM)
-		{
-			uint8_t bom[4] = { 0xFF, 0xFE, 0, 0 };
-			fwrite(bom, 1, 4, f);
-		}
-
-		fwrite(m_data, sizeof(char32_t), m_size, f);
-	}
-
-	if(f)
-		fclose(f);
+	_saveToFileUTF32(fopen(fn, "wb"), addBOM);
 }
+
+void npUnicodeString::SaveToFileUTF8(const wchar_t* fn, bool addBOM)
+{
+	_saveToFileUTF8(_wfopen(fn, L"wb"), addBOM);
+}
+
+void npUnicodeString::SaveToFileUTF16(const wchar_t* fn, bool addBOM)
+{
+	_saveToFileUTF16(_wfopen(fn, L"wb"), addBOM);
+}
+
+void npUnicodeString::SaveToFileUTF32(const wchar_t* fn, bool addBOM)
+{
+	_saveToFileUTF32(_wfopen(fn, L"wb"), addBOM);
+}
+
 
 npUnicodeString& npUnicodeString::operator=(const npUnicodeString& str)
 {
@@ -808,5 +772,74 @@ void npUnicodeString::Insert(char32_t c, size_t where)
 void npUnicodeString::_set_size(size_t size)
 {
 	m_size = size;
+}
+
+void npUnicodeString::_saveToFileUTF8(FILE* f, bool addBOM)
+{
+	if (f && m_data && m_size)
+	{
+		if (addBOM)
+		{
+			uint8_t bom[4] = { 0xEF, 0xBB, 0xBF, 0 };
+			fwrite(bom, 1, 3, f);
+		}
+
+		npUnicodeConverter uc;
+		for (size_t i = 0; i < m_size; ++i)
+		{
+			uc.Set(m_data[i]);
+			for (size_t o = 0; o < uc.m_8Num; ++o)
+			{
+				fwrite(&uc.m_8[o], 1, 1, f);
+			}
+		}
+	}
+
+	if (f)
+		fclose(f);
+}
+
+void npUnicodeString::_saveToFileUTF16(FILE* f, bool addBOM)
+{
+	if (f && m_data && m_size)
+	{
+		if (addBOM)
+		{
+			uint8_t bom[4] = { 0xFF, 0xFE, 0, 0 };
+			fwrite(bom, 1, 2, f);
+		}
+
+		npUnicodeConverter uc;
+		for (size_t i = 0; i < m_size; ++i)
+		{
+			uc.Set(m_data[i]);
+			if (uc.m_16Num)
+			{
+				fwrite(&uc.m_16[0], sizeof(char16_t), 1, f);
+				if (uc.m_16Num > 1)
+					fwrite(&uc.m_16[1], sizeof(char16_t), 1, f);
+			}
+		}
+	}
+
+	if (f)
+		fclose(f);
+}
+
+void npUnicodeString::_saveToFileUTF32(FILE* f, bool addBOM)
+{
+	if (f && m_data && m_size)
+	{
+		if (addBOM)
+		{
+			uint8_t bom[4] = { 0xFF, 0xFE, 0, 0 };
+			fwrite(bom, 1, 4, f);
+		}
+
+		fwrite(m_data, sizeof(char32_t), m_size, f);
+	}
+
+	if (f)
+		fclose(f);
 }
 

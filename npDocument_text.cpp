@@ -34,9 +34,6 @@ npDocument_text::npDocument_text(npRenderer* r,
 	{
 		m_isSaved = true;
 		m_filePath = filePath;
-		npUnicodeConverter uc;
-		uc.char_to_wchar(m_filePath.c_str(), m_filePath.size(), &m_filePathW);
-		
 		_setTitleFromPath();
 	}
 
@@ -1050,14 +1047,11 @@ void npDocument_text::SaveAs()
 		"Save As...",
 		"Save",
 		"txt",
-		&m_filePathW);
+		&m_filePath);
 	
-	if (m_filePathW.size())
+	if (m_filePath.size())
 	{
 		m_isSaved = true;	
-
-		npUnicodeConverter uc;
-		uc.wchar_to_char(m_filePathW.c_str(), m_filePathW.size(), &m_filePath);
 
 		_setTitleFromPath();
 

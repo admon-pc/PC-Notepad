@@ -69,8 +69,7 @@ public:
 
 	npDocumentType GetType() { return m_type; }
 
-	npStringA m_filePath;
-	npStringW m_filePathW;
+	npStringW m_filePath;
 	npStringW m_title;
 	float32_t m_titleLenInPixels = 0.f;
 	npVec4f m_docbarItemRect;

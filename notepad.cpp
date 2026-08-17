@@ -376,7 +376,7 @@ bool notepad::Init(bool secondWnd)
 			std::filesystem::path p(argv[i]);
 			if (std::filesystem::exists(p))
 			{
-				OpenText(p.generic_string().c_str());
+				OpenText(p.generic_wstring().c_str());
 			}
 		}
 	}
@@ -491,14 +491,13 @@ void notepad::ReadRegistry()
 
 					if (std::filesystem::exists(strw.c_str()))
 					{
-						npUnicodeConverter::wchar_to_char(strw.c_str(), strw.size(), &stra);
 						switch (docType)
 						{
 						case npDocumentType::Text:
-							this->OpenText(stra.c_str());
+							this->OpenText(strw.c_str());
 							break;
 						case npDocumentType::Binary:
-							this->OpenBinary(stra.c_str());
+							this->OpenBinary(strw.c_str());
 							break;
 						case npDocumentType::_end:
 							break;
@@ -569,7 +568,7 @@ void notepad::WriteRegistry()
 							wsprintfW(wbuf, L"%u", (uint32_t)item->GetType());
 							subKey->SetValue(L"Type", wbuf);
 
-							subKey->SetValue(L"Path", item->m_filePathW.c_str());
+							subKey->SetValue(L"Path", item->m_filePath.c_str());
 							subKey->SetValue(L"S1", item->GetSelectionBegin());
 							subKey->SetValue(L"S2", item->GetSelectionEnd());
 
@@ -1300,7 +1299,7 @@ void notepad::OpenOpenFileDialog(
 
 void notepad::CreateNewTextDocument(
 	const wchar_t* title,
-	const char* filePath,
+	const wchar_t* filePath,
 	npUnicodeString* text,
 	uint32_t format)
 {
@@ -1327,18 +1326,16 @@ void notepad::CreateNewBinaryDocument()
 		&wstr);
 	if (wstr.size())
 	{
-		npStringA stra;
-		npUnicodeConverter::wchar_to_char(wstr.data(), wstr.size(), &stra);
-		_createNewBinaryDocument(stra.c_str());
+		_createNewBinaryDocument(wstr.c_str());
 	}
 
 }
 
-void notepad::OpenText(const char* f)
+void notepad::OpenText(const wchar_t* f)
 {
 	for (size_t i = 0; i < m_documents.m_size; ++i)
 	{
-		if (strcmp(m_documents.m_data[i]->m_filePath.c_str(), f) == 0)
+		if (wcscmp(m_documents.m_data[i]->m_filePath.c_str(), f) == 0)
 		{
 			m_activeDocument = m_documents.m_data[i];
 			m_activeDocument->OnActivate();
@@ -1373,10 +1370,8 @@ void notepad::OpenText()
 		&wstr);
 	if (wstr.size())
 	{
-		npStringA astr;
-		npUnicodeConverter::wchar_to_char(wstr.data(), wstr.size(), &astr);
-		astr.FlipSlash();
-		OpenText(astr.c_str());
+		wstr.FlipSlash();
+		OpenText(wstr.c_str());
 	}
 }
 
@@ -1395,16 +1390,13 @@ void notepad::OpenBinary()
 		&wstr);
 	if (wstr.size())
 	{
-		npStringA astr;
-		npUnicodeConverter::wchar_to_char(wstr.data(), wstr.size(), &astr);
-
-		OpenBinary(astr.c_str());
+		OpenBinary(wstr.c_str());
 	}
 }
 
-void notepad::_createNewBinaryDocument(const char* str)
+void notepad::_createNewBinaryDocument(const wchar_t* str)
 {
-	FILE* f = 0;
+	/*FILE* f = 0;
 	fopen_s(&f, str, "rb+");
 	if (f)
 	{
@@ -1416,10 +1408,10 @@ void notepad::_createNewBinaryDocument(const char* str)
 		doc->m_titleLenInPixels = m_fontUI->GetTextLen(doc->m_title.data(), doc->m_title.size());
 		m_documents.push_back(doc);
 		m_activeDocument = doc;
-	}
+	}*/
 }
 
-void notepad::OpenBinary(const char* f)
+void notepad::OpenBinary(const wchar_t* f)
 {
 	_createNewBinaryDocument(f);
 	//CreateNewBinaryDocument();
@@ -1446,11 +1438,9 @@ void notepad::OnTextSearchInFilesOpenResult(uint32_t listboxitemindex)
 	{
 		auto& obj = m_textSearchInFiles_data.data()[listboxitemindex];
 
-		npStringA stra;
-		npUnicodeConverter::wchar_to_char(obj.m_filePath, wcslen(obj.m_filePath), &stra);
-		if (stra.size())
+		if (obj.m_filePath)
 		{
-			OpenText(stra.c_str());
+			OpenText(obj.m_filePath);
 			if (m_activeDocument)
 			{
 				m_activeDocument->GoTo(obj.m_line, obj.m_col, false);

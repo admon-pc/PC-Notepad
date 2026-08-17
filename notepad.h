@@ -232,15 +232,15 @@ public:
 
 	void CreateNewTextDocument(
 		const wchar_t* title, 
-		const char* filePath,
+		const wchar_t* filePath,
 		npUnicodeString* text,
 		uint32_t format);
 	void CreateNewBinaryDocument();
-	void _createNewBinaryDocument(const char*);
+	void _createNewBinaryDocument(const wchar_t*);
 	void OpenText();
-	void OpenText(const char*);
+	void OpenText(const wchar_t*);
 	void OpenBinary();
-	void OpenBinary(const char*);
+	void OpenBinary(const wchar_t*);
 
 	bool PointInRect(float32_t x, float32_t y, const npVec4f& rect);
 	float32_t Normalize(float32_t max, float32_t val)

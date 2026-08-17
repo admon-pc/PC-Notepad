@@ -435,7 +435,7 @@ class npDocument_text2 : public npDocument
 	size_t _getLineFromIndex(size_t);
 public:
 	npDocument_text2(npRenderer* r,
-		const char* filePath,
+		const wchar_t* filePath,
 		npUnicodeString* text,
 		uint32_t format);
 	virtual ~npDocument_text2();

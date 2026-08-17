@@ -50,7 +50,6 @@ npDocument_binary::npDocument_binary(
 	npDocument(r)
 {
 	m_filePath = filePath;
-	npUnicodeConverter::char_to_wchar(m_filePath.data(), m_filePath.size(), &m_filePathW);
 
 	m_file = f;
 

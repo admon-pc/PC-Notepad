@@ -4,7 +4,7 @@
 extern notepad* g_app;
 
 npDocument_text2::npDocument_text2(npRenderer* r,
-	const char* filePath,
+	const wchar_t* filePath,
 	npUnicodeString* text,
 	uint32_t format)
 	:
@@ -34,9 +34,6 @@ npDocument_text2::npDocument_text2(npRenderer* r,
 	{
 		m_isSaved = true;
 		m_filePath = filePath;
-		npUnicodeConverter uc;
-		uc.char_to_wchar(m_filePath.c_str(), m_filePath.size(), &m_filePathW);
-
 		_setTitleFromPath();
 	}
 
@@ -1137,14 +1134,11 @@ void npDocument_text2::SaveAs()
 		"Save As...",
 		"Save",
 		"txt",
-		&m_filePathW);
+		&m_filePath);
 
-	if (m_filePathW.size())
+	if (m_filePath.size())
 	{
 		m_isSaved = true;
-
-		npUnicodeConverter uc;
-		uc.wchar_to_char(m_filePathW.c_str(), m_filePathW.size(), &m_filePath);
 
 		_setTitleFromPath();
 
