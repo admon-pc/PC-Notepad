@@ -1189,8 +1189,8 @@ void notepad::OpenSaveFileDialog(
 	okButtonLabelW = okButtonLabel;
 	npStringW extensionTitleW;
 	extensionTitleW = extension;
-	m_fileSaveDialog->SetTitle(titleW.data());
-	m_fileSaveDialog->SetOkButtonLabel(okButtonLabelW.data());
+	HRESULT hr = m_fileSaveDialog->SetTitle(titleW.data());
+	hr = m_fileSaveDialog->SetOkButtonLabel(okButtonLabelW.data());
 	COMDLG_FILTERSPEC rgSpec;
 	rgSpec.pszName = extensionTitleW.data();
 
@@ -1199,8 +1199,8 @@ void notepad::OpenSaveFileDialog(
 	wstr += extension;
 	rgSpec.pszSpec = wstr.data();
 
-	m_fileSaveDialog->SetFileTypes(1, &rgSpec);
-	auto hr = m_fileSaveDialog->Show(m_hwnd);
+	hr = m_fileSaveDialog->SetFileTypes(1, &rgSpec);
+	hr = m_fileSaveDialog->Show(m_hwnd);
 	if (SUCCEEDED(hr))
 	{
 		IShellItem* pItem;

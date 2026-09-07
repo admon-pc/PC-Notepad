@@ -2391,6 +2391,7 @@ void npDocument_text2::DeleteSelected(bool addToHistory)
 	_findHOffsetFromTextCursorPosition();
 	_findCurLineWidth();
 	_updateData();
+	_moveViewIntoTextCursor();
 }
 
 void npDocument_text2::SelectAll()

@@ -6,6 +6,7 @@
 constexpr uint32_t npDocumentTextColors_size = 3;
 const npColor npDocumentTextColors_light[] =
 {
+	// this is colors
 	0xFF000000, // text
 	0xFFFF8A23, // numbers
 	0xFFFF6E00, // "text"
@@ -29,6 +30,9 @@ struct npDocumentHistoryNode_text
 	size_t m_charPosition = 0;
 	bool m_backspace = false;
 	
+	// ЭТА ВЕЩЬ ИСПОЛЬЗУЕТСЯ ДЛЯ СОХРАНЕНИЯ В ИСТОРИЮ
+	// ТОГО МОМЕНТА, КОГДА ВЫДЕЛЯЕШЬ НЕСКОЛЬКО СТРОК И ЖМЁШ TAB.
+	// РЕАЛИЗОВАНО ВРОДЕ КОРРЕКТНО, ОЩУЩЕНИЯ КАК В VisualStudio.
 	// Вместо m_tabsLine проще использовать индекс
 	// это должен быть m_selectionStart
 	size_t m_tabsIndex = 0;
